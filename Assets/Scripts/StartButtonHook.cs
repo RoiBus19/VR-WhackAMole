@@ -4,16 +4,16 @@ public class StartButtonHook : MonoBehaviour
 {
     public GameManager gameManager;
     private XRBaseInteractable interactable;
-    void Awake()
+    private void Awake()
     {
         interactable = GetComponent<XRBaseInteractable>();
     }
-    void OnEnable()
+    private void OnEnable()
     {
         if (interactable != null)
             interactable.selectEntered.AddListener(OnPressed);
     }
-    void OnDisable()
+    private void OnDisable()
     {
         if (interactable != null)
             interactable.selectEntered.RemoveListener(OnPressed);

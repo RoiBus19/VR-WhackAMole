@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,90 +9,86 @@ public class GameManager : MonoBehaviour
    [Header("Round")]
    public float roundDurationSeconds = 45f;
    [Header("UI")]
-   public TextMeshProUGUI scoreText;
-   public TextMeshProUGUI highscoreText;
-   public TextMeshProUGUI stateText;
+   public TMP_Text scoreText;
+   public TMP_Text highscoreText;
+   public TMP_Text stateText;
+   public TMP_Text timerText;
    [Header("Worms")]
    public List<Worm> worms = new List<Worm>();
-   [Header("Audio")]
-   public AudioSource sfxSource;
-   public AudioClip hitClip;
    public GameState State { get; private set; } = GameState.Idle;
    public int Score { get; private set; }
-   private float _timeLeft;
-   private int _highscore;
+   private float timeLeft;
+   private int highscore;
    public static event Action<int> OnScoreChanged;
    public static event Action<GameState> OnStateChanged;
    void Start()
    {
-       _highscore = PlayerPrefs.GetInt("Highscore", 0);
-       SetState(GameState.Idle);
+       highscore = PlayerPrefs.GetInt("Highscore", 0);
        SetScore(0);
+       SetState(GameState.Idle);
        UpdateUI();
    }
    void Update()
    {
        if (State != GameState.Running) return;
-       _timeLeft -= Time.deltaTime;
-       if (_timeLeft <= 0f)
+       timeLeft -= Time.deltaTime;
+       if (timeLeft <= 0f)
        {
+           timeLeft = 0f;
            EndRound();
        }
+       UpdateUI();
    }
    public void StartRound()
    {
        if (State == GameState.Running) return;
        SetScore(0);
-       _timeLeft = roundDurationSeconds;
+       timeLeft = roundDurationSeconds;
        SetState(GameState.Running);
-       foreach (var w in worms)
-           w.SetActiveForRound(true);
+       foreach (var worm in worms)
+       {
+           if (worm != null)
+               worm.SetActiveForRound(true);
+       }
+       UpdateUI();
    }
    public void EndRound()
    {
        if (State != GameState.Running) return;
-       foreach (var w in worms)
-           w.SetActiveForRound(false);
-       SetState(GameState.Ended);
-       if (Score > _highscore)
+       foreach (var worm in worms)
        {
-           _highscore = Score;
-           PlayerPrefs.SetInt("Highscore", _highscore);
+           if (worm != null)
+               worm.SetActiveForRound(false);
+       }
+       if (Score > highscore)
+       {
+           highscore = Score;
+           PlayerPrefs.SetInt("Highscore", highscore);
            PlayerPrefs.Save();
        }
-       UpdateUI();
-   }
-   public void ResetToIdle()
-   {
-       foreach (var w in worms)
-           w.SetActiveForRound(false);
-       SetScore(0);
-       SetState(GameState.Idle);
+       SetState(GameState.Ended);
        UpdateUI();
    }
    public void RegisterHit()
    {
        if (State != GameState.Running) return;
        SetScore(Score + 1);
-       if (sfxSource && hitClip)
-           sfxSource.PlayOneShot(hitClip);
    }
    private void SetScore(int value)
    {
        Score = value;
        OnScoreChanged?.Invoke(Score);
-       UpdateUI();
    }
-   private void SetState(GameState s)
+   private void SetState(GameState newState)
    {
-       State = s;
+       State = newState;
        OnStateChanged?.Invoke(State);
-       UpdateUI();
    }
    private void UpdateUI()
    {
-       if (scoreText) scoreText.text = $"Score: {Score}";
-       if (highscoreText) highscoreText.text = $"Highscore: {_highscore}";
-       if (stateText) stateText.text = $"State: {State}";
+       if (scoreText != null) scoreText.text = "Score: " + Score;
+       if (highscoreText != null) highscoreText.text = "Highscore: " + highscore;
+       if (stateText != null) stateText.text = "State: " + State;
+       if (timerText != null) timerText.text = "Time: " + Mathf.CeilToInt(timeLeft);
    }
 }
