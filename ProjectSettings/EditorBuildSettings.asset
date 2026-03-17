@@ -12,4 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 614cf4d633f77d54485b942eb63f1089
   m_configObjects:
+    Unity.XR.PXR.Settings: {fileID: 11400000, guid: 302fa7128de65434992b7373fc536858, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 117abd38b6520d24a947d36b519a799a, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: f1ccc21fa6df2274ba9e0db0faca6c97, type: 2}
